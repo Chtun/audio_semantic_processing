@@ -750,8 +750,6 @@ class MainDataset(Dataset):
 
         fbank = fbank.unsqueeze(0).repeat(3, 1, 1)
 
-        print("Getting another item.")
-
         if self.cen_mean:
             t_a_list = self.sample_t_a()
             if self.ftmode != "audio_only":

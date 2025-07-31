@@ -50,10 +50,12 @@ class ModelTrainer(nn.Module):
         self.__model__  = equiAV
         self.gpu = gpu
 
-        if self.gpu == 0:
+        if kwargs['device'] == "cpu":
             self.device = torch.device('cpu')
+            self.device_name = "cpu"
         else:
-            self.device = torch.device('gpu')
+            self.device = torch.device('cuda')
+            self.device_name = "cuda"
 
         self.mixedprec = mixedprec
         self.freeze_base = freeze_base
@@ -148,10 +150,9 @@ class ModelTrainer(nn.Module):
             data_a, data_v, _,_,_,_,labels = data
 
             # transform input to torch cuda tensor if running gpu
-            if self.gpu > 0:
-                data_a = data_a.to(self.device)          # batch x target_length x num melbins
-                data_v = data_v.to(self.device)          # batch x channel x width x height
-                labels = labels.to(self.device)
+            data_a = data_a.to(self.device)          # batch x target_length x num melbins
+            data_v = data_v.to(self.device)          # batch x channel x width x height
+            labels = labels.to(self.device)
 
             # ==================== FORWARD PASS ====================
             with autocast(enabled=self.mixedprec):
@@ -241,7 +242,7 @@ class ModelTrainer(nn.Module):
     def loadParameters(self, path):
         self_state = self.__model__.module.state_dict();
 
-        if self.gpu == 0:
+        if self.device_name == "cpu":
             loaded_state = torch.load(path, map_location="cpu");
         else:
             loaded_state = torch.load(path, map_location="cuda:%d"%self.gpu);

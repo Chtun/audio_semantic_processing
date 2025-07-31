@@ -24,6 +24,7 @@ warnings.filterwarnings(action='ignore')
 
 parser = argparse.ArgumentParser(description = "TrainArgs");
 
+parser.add_argument('--device', type=str,   default='gpu',   help='The type of device to use')
 parser.add_argument('--gpu', type=str,   default='0',   help='gpu id to use');
 
 ## Data definition
@@ -34,7 +35,7 @@ parser.add_argument("--bal", type=lambda x:bool(distutils.util.strtobool(x)),  d
 parser.add_argument("--num_mel_bins", type=int, default=128,    help="number of mel bins of spectrogram");
 
 # dataset augmentations for finetuning
-parser.add_argument("--mixup", type=float, default=0.5, help="how many (0-1) samples need to be mixup during training");
+parser.add_argument("--mixup", type=float, default=0.0, help="how many (0-1) samples need to be mixup during training");
 parser.add_argument("--noise", type=lambda x:bool(distutils.util.strtobool(x)),  default=False, help='if use balance sampling');
 parser.add_argument('--ft_freqm', type=int, default=48, help='frequency mask max length');
 parser.add_argument('--ft_timem', type=int, default=192, help='time mask max length');
@@ -151,9 +152,9 @@ def main_worker(gpu, ngpus_per_node, args):
         
         print('Loaded the model on GPU {:d}'.format(args.gpu))
 
-    elif args.gpu > 0:
+    elif args.device == "gpu":
         model = WrappedModel(model).cuda(args.gpu)
-    elif args.gpu == 0:
+    elif args.device == "cpu":
         model = WrappedModel(model)
 
     # Initialise dataset
