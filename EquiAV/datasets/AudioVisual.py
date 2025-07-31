@@ -266,14 +266,19 @@ class MainDataset(Dataset):
             return image_tensor
 
     def _wav2fbank(self, filename, filename2=None, mix_lambda=-1):
+        # Load and convert to mono immediately
+        waveform1, sr = torchaudio.load(filename)
+        if waveform1.shape[0] > 1:
+            waveform1 = torch.mean(waveform1, dim=0, keepdim=True)
+
         # no mixup
         if filename2 == None:
-            waveform, sr = torchaudio.load(filename)
-            waveform = waveform - waveform.mean()
+            waveform = waveform1 - waveform1.mean()
         # mixup
         else:
-            waveform1, sr = torchaudio.load(filename)
             waveform2, _ = torchaudio.load(filename2)
+            if waveform2.shape[0] > 1:
+                waveform2 = torch.mean(waveform2, dim=0, keepdim=True)
 
             waveform1 = waveform1 - waveform1.mean()
             waveform2 = waveform2 - waveform2.mean()
@@ -281,13 +286,13 @@ class MainDataset(Dataset):
             if waveform1.shape[1] != waveform2.shape[1]:
                 if waveform1.shape[1] > waveform2.shape[1]:
                     # padding
-                    temp_wav = torch.zeros(1, waveform1.shape[1])
-                    temp_wav[0, 0:waveform2.shape[1]] = waveform2
+                    temp_wav = torch.zeros_like(waveform1)
+                    temp_wav[:, 0:waveform2.shape[1]] = waveform2
                     waveform2 = temp_wav
                 else:
                     # cutting
-                    waveform2 = waveform2[0, 0:waveform1.shape[1]]
-
+                    waveform2 = waveform2[:, 0:waveform1.shape[1]]
+                
             mix_waveform = mix_lambda * waveform1 + (1 - mix_lambda) * waveform2
             waveform = mix_waveform - mix_waveform.mean()
 
@@ -295,7 +300,6 @@ class MainDataset(Dataset):
             fbank = torchaudio.compliance.kaldi.fbank(waveform, htk_compat=True, sample_frequency=sr, use_energy=False, window_type='hanning', num_mel_bins=self.melbins, dither=0.0, frame_shift=10)
         except:
             fbank = torch.zeros([512, 128]) + 0.01
-            if gpu == 0: print('there is a loading error')
 
         target_length = self.target_length
         n_frames = fbank.shape[0]
@@ -310,6 +314,7 @@ class MainDataset(Dataset):
             fbank = fbank[0:target_length, :]
 
         return fbank
+
 
     def randselect_img(self, video_id, video_path):
         if self.mode == 'test':
@@ -339,6 +344,10 @@ class MainDataset(Dataset):
                 print('there is an error in loading audio')
                 print(e)
 
+            print("Mixing up:")
+            print(fbank.shape)
+
+
             if self.ftmode != "audio_only":
                 try:
                     image = self.get_image(self.randselect_img(datum['video_id'], datum['video_path']), self.randselect_img(mix_datum['video_id'], mix_datum['video_path']), mix_lambda)
@@ -364,6 +373,9 @@ class MainDataset(Dataset):
                 fbank = torch.zeros([self.target_length, 128]) + 0.01
                 print('there is an error in loading audio')
                 print(e)
+
+            print("Not mixing up:")
+            print(fbank.shape)
 
             if self.ftmode != "audio_only":
                 try:
