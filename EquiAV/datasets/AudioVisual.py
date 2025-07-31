@@ -344,9 +344,6 @@ class MainDataset(Dataset):
                 print('there is an error in loading audio')
                 print(e)
 
-            print("Mixing up:")
-            print(fbank.shape)
-
 
             if self.ftmode != "audio_only":
                 try:
@@ -373,9 +370,6 @@ class MainDataset(Dataset):
                 fbank = torch.zeros([self.target_length, 128]) + 0.01
                 print('there is an error in loading audio')
                 print(e)
-
-            print("Not mixing up:")
-            print(fbank.shape)
 
             if self.ftmode != "audio_only":
                 try:
