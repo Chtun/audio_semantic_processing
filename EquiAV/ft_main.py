@@ -107,6 +107,7 @@ weight_file = f'/home/lhk/workspace/ESSL/EquiAV/datasets/dataprep/{args.dataset}
 
 label_dim = {'AudioSet_2M':[527,'mAP'],
              'AudioSet_20K':[527,'mAP'],
+             'AudioSet_20K_Targeted':[21, 'mAP'],
              'VGGSound':[309,'acc']}
 
 args.label_dim = label_dim[args.dataset][0]
@@ -161,8 +162,8 @@ def main_worker(gpu, ngpus_per_node, args):
     verbose_print(args.gpu, '\n=================Load Dataset=================')
     DataSet = importlib.import_module('datasets.AudioVisual').__getattribute__('MainDataset')
 
-    norm_stats = {'AudioSet_2M':[-4.346, 4.332],'AudioSet_20K':[-4.346, 4.332],'VGGSound':[-4.956, 4.486]}   
-    target_length = {'AudioSet_2M':1024,'AudioSet_20K':1024,'VGGSound':1024}
+    norm_stats = {'AudioSet_2M':[-4.346, 4.332],'AudioSet_20K':[-4.346, 4.332], 'AudioSet_20K_Targeted':[-4.346, 4.332],'VGGSound':[-4.956, 4.486]}   
+    target_length = {'AudioSet_2M':1024,'AudioSet_20K':1024, 'AudioSet_20K_Targeted':1024, 'VGGSound':1024}
     
     audio_conf = {'target_length': target_length[args.dataset],
                         'im_res': 224, 'nmels': 128,
