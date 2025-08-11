@@ -2,6 +2,8 @@ joblib
 yt-dlp
 ffmpeg
 ffprobe
+pandas
+numpy
 
 timm==0.4.12
 torchaudio
