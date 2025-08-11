@@ -1,18 +1,15 @@
-# [ICML 2024] EquiAV: Leveraging Equivariance for Audio-Visual Contrastive Learning
+# [ICML 2024] Re-Implementation of EquiAV, Finetuned on Target Subset of AudioSet
 
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Python](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-311/)
 [![Pytorch](https://img.shields.io/badge/Pytorch-1.10.1-red.svg)](https://pytorch.org/get-started/previous-versions/#v21)
 
-This repository contains the source code of our paper [EquiAV:Leveraging Equivariance for Audio-Visual Contrastive Learning](https://arxiv.org/abs/2403.09502) (ICML2024). You can also check out the introduction video of the paper [here](https://youtu.be/BJ8Mt4qGn5c).
-
-
 
 ## Abstract
 <p align="center"><img src="./image/EquiAV-Intro.PNG" width="50%" />
 
-Recent advancements in self-supervised audio-visual representation learning have demonstrated its potential to capture rich and comprehensive representations. However, despite the advantages of data augmentation verified in many learning methods, audio-visual learning has struggled to fully harness these benefits, as augmentations can easily disrupt the correspondence between input pairs. To address this limitation, we introduce EquiAV, a novel framework that leverages equivariance for audio-visual contrastive learning. Our approach begins with extending equivariance to audio-visual learning, facilitated by a shared attention-based transformation predictor. It enables the aggregation of features from diverse augmentations into a representative embedding, providing robust supervision. Notably, this is achieved with minimal computational overhead. Extensive ablation studies and qualitative results verify the effectiveness of our method. EquiAV outperforms previous works across various audio-visual benchmarks.
+EquiAV model re-implementation.
 
 ## Getting Started
 ### 1. Prepare Environment & Dataset

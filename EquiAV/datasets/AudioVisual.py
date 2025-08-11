@@ -15,7 +15,6 @@ from torch.utils.data import Dataset
 from torchvision.transforms import functional as F
 from PIL import Image, ImageFilter
 from torch import Tensor
-from decord import gpu
 
 # change python list to numpy array to avoid memory leak.
 def pro_data(data_json):

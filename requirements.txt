@@ -1,0 +1,10 @@
+joblib
+yt-dlp
+ffmpeg
+ffprobe
+
+timm==0.4.12
+torchaudio
+wandb
+scipy
+scikit-learn

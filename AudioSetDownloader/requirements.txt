@@ -1,4 +1,0 @@
-joblib
-yt-dlp
-ffmpeg
-ffprobe
