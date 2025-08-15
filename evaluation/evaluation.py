@@ -6,6 +6,7 @@ import pandas as pd
 import csv
 import time
 import json
+import os
 
 # Step 1: Instantiate the model with appropriate args (some grabbed from EquiAV defaults)
 label_dim = 21 # 21 target classes for AudioSet_20K_Targeted

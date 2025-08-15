@@ -101,31 +101,38 @@ class MainModel(nn.Module):
 
         self.ftmode = ftmode
         self.att_softmax = nn.Softmax(dim=-1)
+
         
-        self.patch_embed_a = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
-        self.patch_embed_v = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
+        if self.ftmode == 'multimodal' or self.ftmode == 'audio_only':
+            self.patch_embed_a = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
+            self.patch_embed_a.num_patches = int(self.audio_length * num_mel_bins / 256)
 
-        self.patch_embed_a.num_patches = int(self.audio_length * num_mel_bins / 256)
-        # self.patch_embed_v.num_patches = self.patch_embed_v.num_patches * 8
+            if gpu == 0:
+                print('Number of Audio Patches: {:d}'.format(self.patch_embed_a.num_patches))
 
-        if gpu == 0:
-            print('Number of Audio Patches: {:d}, Visual Patches: {:d}'.format(self.patch_embed_a.num_patches, self.patch_embed_v.num_patches))
 
-        self.modality_a = nn.Parameter(torch.zeros(1, 1, embed_dim))
-        self.modality_v = nn.Parameter(torch.zeros(1, 1, embed_dim))
+            self.modality_a = nn.Parameter(torch.zeros(1, 1, embed_dim))
+            self.pos_embed_a = nn.Parameter(torch.zeros(1, self.patch_embed_a.num_patches, embed_dim), requires_grad=tr_pos)  # fixed sin-cos embedding
+            # audio-branch
+            self.blocks_a = nn.ModuleList([Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, drop=drop_out, drop_path=drop_path, norm_layer=norm_layer) for i in range(modality_specific_depth)])
+            # independent normalization layer for audio, visual, and audio-visual
+            # before projector
+            self.norm_a = norm_layer(embed_dim)
 
-        self.pos_embed_a = nn.Parameter(torch.zeros(1, self.patch_embed_a.num_patches, embed_dim), requires_grad=tr_pos)  # fixed sin-cos embedding
-        self.pos_embed_v = nn.Parameter(torch.zeros(1, self.patch_embed_v.num_patches, embed_dim), requires_grad=tr_pos)  # fixed sin-cos embedding
+        if self.ftmode == 'multimodal' or self.ftmode == 'video_only':
+            self.patch_embed_v = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
+            # self.patch_embed_v.num_patches = self.patch_embed_v.num_patches * 8
 
-        # audio-branch
-        self.blocks_a = nn.ModuleList([Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, drop=drop_out, drop_path=drop_path, norm_layer=norm_layer) for i in range(modality_specific_depth)])
-        # visual-branch
-        self.blocks_v = nn.ModuleList([Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, drop=drop_out, drop_path=drop_path, norm_layer=norm_layer) for i in range(modality_specific_depth)])
-        
-        # independent normalization layer for audio, visual, and audio-visual
-        # before projector
-        self.norm_a = norm_layer(embed_dim)
-        self.norm_v = norm_layer(embed_dim)
+            if gpu == 0:
+                print('Number of Visual Patches: {:d}'.format(self.patch_embed_v.num_patches))
+
+            self.pos_embed_v = nn.Parameter(torch.zeros(1, self.patch_embed_v.num_patches, embed_dim), requires_grad=tr_pos)  # fixed sin-cos embedding
+            self.modality_v = nn.Parameter(torch.zeros(1, 1, embed_dim))
+            # visual-branch
+            self.blocks_v = nn.ModuleList([Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, drop=drop_out, drop_path=drop_path, norm_layer=norm_layer) for i in range(modality_specific_depth)])
+            # independent normalization layer for audio, visual, and audio-visual
+            # before projector
+            self.norm_v = norm_layer(embed_dim)
 
         # intra-modal(equivariant) and inter-modal(invariant) projection heads
         if inter_linear:
@@ -156,30 +163,42 @@ class MainModel(nn.Module):
         else:
             print('not appropriate train mode')
             self.mlp_head = nn.Sequential(nn.Linear(1, label_dim))
+        
         self.initialize_weights()
 
         if gpu == 0:
-            print('Audio Positional Embedding Shape:', self.pos_embed_a.shape)
-            print('Visual Positional Embedding Shape:', self.pos_embed_v.shape)
+            if self.ftmode == 'multimodal' or self.ftmode == 'audio_only':
+                print('Audio Positional Embedding Shape:', self.pos_embed_a.shape)
+
+            if self.ftmode == 'multimodal' or self.ftmode == 'visual_only':
+                print('Visual Positional Embedding Shape:', self.pos_embed_v.shape)
 
     def initialize_weights(self):
-        # initialize (and freeze) pos_embed by sin-cos embedding, opt the cls token, add by myself
-        pos_embed_a = get_2d_sincos_pos_embed(self.pos_embed_a.shape[-1], 8, int(self.patch_embed_a.num_patches/8), cls_token=False)
-        self.pos_embed_a.data.copy_(torch.from_numpy(pos_embed_a).float().unsqueeze(0))
+        
+        if self.ftmode == 'multimodal' or self.ftmode == 'audio_only':
+            # initialize (and freeze) pos_embed by sin-cos embedding, opt the cls token, add by myself
+            pos_embed_a = get_2d_sincos_pos_embed(self.pos_embed_a.shape[-1], 8, int(self.patch_embed_a.num_patches/8), cls_token=False)
+            self.pos_embed_a.data.copy_(torch.from_numpy(pos_embed_a).float().unsqueeze(0))
 
-        # pos_embed_v = get_2d_sincos_pos_embed(self.pos_embed_v.shape[-1], 8, int(self.patch_embed_v.num_patches/8), cls_token=False)
-        pos_embed_v = get_2d_sincos_pos_embed(self.pos_embed_v.shape[-1], int(self.patch_embed_v.num_patches ** .5), int(self.patch_embed_v.num_patches ** .5), cls_token=False)
-        self.pos_embed_v.data.copy_(torch.from_numpy(pos_embed_v).float().unsqueeze(0))
+            # initialize patch_embed like nn.Linear (instead of nn.Conv2d)
+            w = self.patch_embed_a.proj.weight.data
+            torch.nn.init.xavier_uniform_(w.view([w.shape[0], -1]))
 
-        # initialize patch_embed like nn.Linear (instead of nn.Conv2d)
-        w = self.patch_embed_a.proj.weight.data
-        torch.nn.init.xavier_uniform_(w.view([w.shape[0], -1]))
-        w = self.patch_embed_v.proj.weight.data
-        torch.nn.init.xavier_uniform_(w.view([w.shape[0], -1]))
+            # timm's trunc_normal_(std=.02) is effectively normal_(std=0.02) as cutoff is too big (2.)
+            torch.nn.init.normal_(self.modality_a, std=.02)
 
-        # timm's trunc_normal_(std=.02) is effectively normal_(std=0.02) as cutoff is too big (2.)
-        torch.nn.init.normal_(self.modality_a, std=.02)
-        torch.nn.init.normal_(self.modality_v, std=.02)
+        if self.ftmode == 'multimodal' or self.ftmode == 'video_only':
+            # pos_embed_v = get_2d_sincos_pos_embed(self.pos_embed_v.shape[-1], 8, int(self.patch_embed_v.num_patches/8), cls_token=False)
+            pos_embed_v = get_2d_sincos_pos_embed(self.pos_embed_v.shape[-1], int(self.patch_embed_v.num_patches ** .5), int(self.patch_embed_v.num_patches ** .5), cls_token=False)
+            self.pos_embed_v.data.copy_(torch.from_numpy(pos_embed_v).float().unsqueeze(0))
+
+            # initialize patch_embed like nn.Linear (instead of nn.Conv2d)
+            w = self.patch_embed_v.proj.weight.data
+            torch.nn.init.xavier_uniform_(w.view([w.shape[0], -1]))
+
+            # timm's trunc_normal_(std=.02) is effectively normal_(std=0.02) as cutoff is too big (2.)
+            torch.nn.init.normal_(self.modality_v, std=.02)
+    
         # initialize nn.Linear and nn.LayerNorm
         self.apply(self._init_weights)
 
