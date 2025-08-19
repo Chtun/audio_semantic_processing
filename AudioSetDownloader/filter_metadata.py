@@ -35,7 +35,7 @@ def grab_label_ids(input_file_path: str, labels_to_match: list):
 def filter_label_in_metadata(json_filepath, label_ids: list):
     """
     Reads a JSON file with a 'data' key containing an array,
-    modifies 'wav' paths within that array, and overwrites the file.
+    modifies 'labels' list within that array, and overwrites the file.
 
     Args:
         json_filepath (str): The path to the JSON file (e.g., train.json, test.json).

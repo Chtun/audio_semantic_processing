@@ -263,3 +263,78 @@ class ModelTrainer(nn.Module):
                 continue;
 
             self_state[name].copy_(param);
+
+    def train_on_single_pair(self, audio_data, video_data, label_data):
+        """
+        Trains the network on a single audio, video, and label pair.
+
+        Args:
+            self: An instance of the class containing the model, optimizer, etc.
+                (e.g., your Trainer class).
+            audio_data (torch.Tensor): A single audio input tensor.
+            video_data (torch.Tensor): A single video input tensor.
+            label_data (torch.Tensor): A single label tensor.
+
+        Returns:
+            float: The training loss for this single pair.
+        """
+        print("Beginning to train network on a single pair!")
+
+        # Setting for the logging (simplified for a single pair)
+        batch_time = AverageMeter('Time', ':6.2f')
+        data_time = AverageMeter('Data', ':6.2f')
+        mem = AverageMeter('Mem (GB)', ':6.1f')
+        metrics = AverageMeter('Train Loss', ':1.3e')
+
+        # Ensure model is in training mode
+        self.__model__.train()
+
+        end = time.time()
+
+        # Measure "data loading" time (simulated for a single pair)
+        data_time.update(0) # Since data is directly passed
+
+        # transform input to torch cuda tensor if running gpu
+        audio_data = audio_data.to(self.device)  # target_length x num melbins (assuming batch dim is handled by model)
+        video_data = video_data.to(self.device)  # channel x width x height (assuming batch dim is handled by model)
+        label_data = label_data.to(self.device)
+
+        # Add a batch dimension if your model expects it
+        # For example, if your model expects [batch_size, ...] but you're passing [feature_dims, ...]
+        audio_data = audio_data.unsqueeze(0) if audio_data.dim() == 2 else audio_data
+        video_data = video_data.unsqueeze(0) if video_data.dim() == 3 else video_data
+        label_data = label_data.unsqueeze(0) if label_data.dim() == 1 else label_data
+
+
+        print("Next data is training!") # This print will now happen for the single pair
+
+        # ==================== FORWARD PASS ====================
+        with autocast(enabled=self.mixedprec):
+            loss_dict, outputs = self.__model__(audio_data, video_data, labels=label_data)
+
+        _new_lr = self.__scheduler__.step() # You might want to control when scheduler steps
+
+        if self.mixedprec:
+            # mixed precision
+            self.scaler.scale(loss_dict['loss']).backward()
+            self.scaler.step(self.__optimizer__)
+            self.scaler.update()
+        else:
+            # single precision
+            loss_dict['loss'].backward()
+            self.__optimizer__.step()
+
+        self.zero_grad() # Assuming this resets gradients for the next step
+
+        # logging
+        # For a single pair, batch_size is 1
+        metrics.update(loss_dict['loss'].item(), 1) # Use .item() to get scalar from tensor
+
+        # measure elapsed time and memory
+        batch_time.update(time.time() - end)
+        mem.update(torch.cuda.max_memory_allocated() // 1e9)
+
+        print(f"Trained on single pair. Loss: {metrics.val:.4f}")
+
+        # You can return the loss or any other relevant metric
+        return metrics.val

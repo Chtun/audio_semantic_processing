@@ -173,6 +173,32 @@ def format_model_input(file_path: str, target_length: int, num_mel_bins: int, no
 
     return fbank
 
+def format_label_data(labels: str, index_dict, classes_num: int, label_smooth: float):
+    """
+    Processes a datum and returns the label indices based on mixup and label smoothing.
+
+    Args:
+        labels: A string of commma-separated labels.
+        index_dict (dict): A dictionary containing the 'labels' string to index.
+        label_num: The number of classes.
+        label_smooth: The amount to smooth the label by.
+
+
+    Returns:
+        torch.FloatTensor: The processed label indices.
+    """
+    label_indices = np.zeros(classes_num) + (label_smooth / classes_num)
+    
+    for label_str in labels.split(','):
+        # Look up the integer index from the dictionary
+        if label_str in index_dict:
+            label_indices[index_dict[label_str]] = 1.0 - label_smooth
+        else:
+            # Handle cases where a label might not be in the dictionary
+            print(f"Warning: Label '{label_str}' not found in index dictionary.")
+            
+    return torch.FloatTensor(label_indices)
+
 ## Main Dataset Code
 
 class MainDataset(Dataset):
