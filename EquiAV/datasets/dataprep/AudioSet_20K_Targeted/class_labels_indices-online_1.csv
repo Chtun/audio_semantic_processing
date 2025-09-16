@@ -1,0 +1,23 @@
+index,mid,display_name
+0,/m/09x0r,Speech
+1,/m/05zppz,"Male speech, man speaking"
+2,/m/02zsn,"Female speech, woman speaking"
+4,/m/0lyf6,Breathing
+5,/m/01b_21,Cough
+3,/m/07pbtc8,"Walk, footsteps"
+6,/m/0bt9lr,Dog
+8,/m/05tny_,Bark
+7,/m/01yrx,Cat
+9,/m/07qrkrw,Meow
+15,/m/04rlf,Music
+11,/m/0838f,Water
+19,/m/02dgv,Door
+18,/m/04brg2,"Dishes, pots, and pans"
+17,/m/0fx9l,Microwave oven
+12,/m/02jz0l,"Water tap, faucet"
+14,/m/0130jx,Sink (filling or washing)
+13,/m/01jt3m,Toilet flush
+16,/m/0d31p,Vacuum cleaner
+10,/t/dd00125,"Inside, small room"
+20,/m/07c52,Television
+21,/m/03wwcy,"Doorbell"

@@ -240,29 +240,51 @@ class ModelTrainer(nn.Module):
     ## ===== ===== ===== ===== ===== ===== ===== =====
 
     def loadParameters(self, path):
-        self_state = self.__model__.module.state_dict();
+        self_state = self.__model__.module.state_dict()
 
         if self.device_name == "cpu":
-            loaded_state = torch.load(path, map_location="cpu");
+            loaded_state = torch.load(path, map_location="cpu")
         else:
-            loaded_state = torch.load(path, map_location="cuda:%d"%self.gpu);
+            loaded_state = torch.load(path, map_location="cuda:%d"%self.gpu)
+        
+
         for name, param in loaded_state.items():
-            origname = name;
+            origname = name
             if name not in self_state:
                 name = origname.replace('__M__.','') if 'cav_mae' not in self.model_name else origname.replace('module','__M__')
                 if name not in self_state:
-                    if self.gpu == 0: print("{} is not in the model.".format(origname));
-                    continue;
+                    if self.gpu == 0: print("{} is not in the model.".format(origname))
+                    continue
                 else:
-                    if self.gpu == 0: print("{} is loaded in the model".format(name));
+                    if self.gpu == 0: print("{} is loaded in the model".format(name))
             else:
-                if self.gpu == 0: print("{} is loaded in the model".format(name));
+                if self.gpu == 0: print("{} is loaded in the model".format(name))
 
-            if self_state[name].size() != loaded_state[origname].size():
-                if self.gpu == 0: print("Wrong parameter length: {}, model: {}, loaded: {}".format(origname, self_state[name].size(), loaded_state[origname].size()));
-                continue;
+            model_param = self_state[name]
 
-            self_state[name].copy_(param);
+            if model_param.size() != param.size():
+                if 'head' in name.lower():  # covers mlp_head, classifier, etc.
+                    if model_param.dim() == 2:  # weight
+                        num_rows_to_copy = min(model_param.size(0), param.size(0))
+                        with torch.no_grad():
+                            model_param[:num_rows_to_copy].copy_(param[:num_rows_to_copy])
+                        if self.gpu == 0:
+                            print(f"Warning: {name} weight mismatch. Copied first {num_rows_to_copy} rows; remaining rows keep current initialization.")
+                    elif model_param.dim() == 1:  # bias
+                        num_elements_to_copy = min(model_param.size(0), param.size(0))
+                        with torch.no_grad():
+                            model_param[:num_elements_to_copy].copy_(param[:num_elements_to_copy])
+                        if self.gpu == 0:
+                            print(f"Warning: {name} bias mismatch. Copied first {num_elements_to_copy} entries; remaining entries keep current initialization.")
+                    continue
+                else:
+                    if self.gpu == 0:
+                        print(f"Warning: parameter {name} shape mismatch, model: {model_param.size()}, checkpoint: {param.size()}. Skipping.")
+                    continue
+
+            # Exact match: copy entire parameter
+            model_param.copy_(param)
+
 
     def train_on_single_pair(self, audio_data, video_data, label_data):
         """

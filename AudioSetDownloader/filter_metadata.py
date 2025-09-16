@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 
-def grab_label_ids(input_file_path: str, labels_to_match: list):
+def grab_label_ids(input_file_path: str):
     """
     Reads a label mapping CSV file, and grabs the specified label IDs from their names.
 
@@ -23,12 +23,7 @@ def grab_label_ids(input_file_path: str, labels_to_match: list):
         print(f"An error occurred while reading the file: {e}")
         return
 
-    # --- Filter the DataFrame for the specified labels ---
-    label_to_index_map = {label: i for i, label in enumerate(labels_to_match)}
-    df_filtered = df_original[df_original['display_name'].isin(labels_to_match)].copy()
-    df_filtered['index'] = df_filtered['display_name'].map(label_to_index_map)
-
-    label_ids = df_filtered["mid"]
+    label_ids = df_original["mid"]
 
     return label_ids.tolist()
 
@@ -82,33 +77,12 @@ def filter_label_in_metadata(json_filepath, label_ids: list):
         print(f"An unexpected error occurred while processing {json_filepath}: {e}")
 
 
-labels_to_match = [
-    "Speech",
-    "Male speech, man speaking",
-    "Female speech, woman speaking",
-    "Walk, footsteps",
-    "Breathing",
-    "Cough",
-    "Dog",
-    "Cat",
-    "Bark",
-    "Meow",
-    "Inside, small room",
-    "Water",
-    "Water tap, faucet",
-    "Toilet flush",
-    "Sink (filling or washing)",
-    "Music",
-    "Vacuum cleaner",
-    "Microwave oven",
-    "Dishes, pots, and pans",
-    "Door",
-    "Television"
-]
 
+class_indices_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices-online_1.csv"
+label_ids = grab_label_ids(class_indices_path)
 
-class_indices_path = "/home/chtun/Documents/AudioSemanticModel/audio_semantic_processing/EquiAV/datasets/AudioSet/class_labels_indices.csv"
-label_ids = grab_label_ids(class_indices_path, labels_to_match)
+train_metadata_path = "../EquiAV/datasets/AudioSet/train_metadata.json"
+filter_label_in_metadata(train_metadata_path, label_ids)
 
-eval_metadata_path = "/home/chtun/Documents/AudioSemanticModel/audio_semantic_processing/EquiAV/datasets/AudioSet/test_metadata.json"
+eval_metadata_path = "../EquiAV/datasets/AudioSet/test_metadata.json"
 filter_label_in_metadata(eval_metadata_path, label_ids)

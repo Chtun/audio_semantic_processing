@@ -9,7 +9,7 @@ def change_metadata_paths(json_filepath, base_path: str):
 
     Args:
         json_filepath (str): The path to the JSON file (e.g., train.json, test.json).
-        base_folder_in_colab (str): The base folder path in Colab
+        base_folder_in_colab (str): The base folder path that contains the data.
                                       (e.g., /content/drive/MyDrive/audio_data/AudioSet/train).
     """
     print(f"Processing {json_filepath}...")
@@ -48,10 +48,12 @@ def change_metadata_paths(json_filepath, base_path: str):
         print(f"An unexpected error occurred while processing {json_filepath}: {e}")
 
 
-base_path = "/home/chtun/Documents/AudioSemanticModel/audio_semantic_processing/EquiAV/datasets/dataprep/AudioSet_20K_Targeted/test/"
+base_train_path = "../EquiAV/datasets/AudioSet/train/"
 
-train_path = "/home/chtun/Documents/AudioSemanticModel/audio_semantic_processing/EquiAV/datasets/dataprep/AudioSet_20K_Targeted/train.json"
-change_metadata_paths(train_path, base_path=base_path)
+train_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/train.json"
+change_metadata_paths(train_path, base_path=base_train_path)
 
-test_path = "/home/chtun/Documents/AudioSemanticModel/audio_semantic_processing/EquiAV/datasets/dataprep/AudioSet_20K_Targeted/test.json"
-change_metadata_paths(test_path, base_path=base_path)
+
+base_test_path = "../EquiAV/datasets/AudioSet/test/"
+test_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/test.json"
+change_metadata_paths(test_path, base_path=base_test_path)

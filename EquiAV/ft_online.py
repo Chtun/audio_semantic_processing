@@ -24,12 +24,13 @@ warnings.filterwarnings(action='ignore')
 parser = argparse.ArgumentParser(description = "TrainArgs");
 
 parser.add_argument('--device', type=str,   default='cpu',   help='The type of device to use')
-parser.add_argument('--gpu', type=str,   default='0',   help='gpu id to use');
+parser.add_argument('--gpu', type=int,   default=0,   help='gpu id to use');
 
 ## Data definition
 parser.add_argument('--dataset', type=str, default="AudioSet_20K_Targeted", help="The type of datset being used.")
 parser.add_argument('--metadata',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/test.json", help='Path of dataset metadata.');
 parser.add_argument('--class_indices',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv", help='Path of dataset class index mapping.')
+parser.add_argument('--old_class_indices', type=str, default='./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv')
 parser.add_argument('--fold',type=str, default="1", help='name of dataset definition');
 parser.add_argument("--bal", type=lambda x:bool(distutils.util.strtobool(x)),  default=False, help="weight sampling for class balance ex) 'bal'");
 
@@ -102,15 +103,39 @@ args = parser.parse_args();
 
 weight_file = f'/home/lhk/workspace/ESSL/EquiAV/datasets/dataprep/{args.dataset}/weights.csv' if args.bal else None
 
-label_dim = {'AudioSet_2M':[527,'mAP'],
-             'AudioSet_20K':[527,'mAP'],
-             'AudioSet_20K_Targeted':[21, 'mAP'],
-             'VGGSound':[309,'acc']}
+label_metric = {'AudioSet_2M':'mAP',
+             'AudioSet_20K':'mAP',
+             'AudioSet_20K_Targeted':'mAP',
+             'VGGSound': 'acc'}
 
-args.label_dim = label_dim[args.dataset][0]
-args.main_metrics = label_dim[args.dataset][1]
+args.main_metrics = label_metric[args.dataset]
 
-os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+try:
+    # Read new class indices
+    # We set the 'index' column as the DataFrame index for direct integer-based lookup
+    class_labels_df = pd.read_csv(args.class_indices, index_col='index')
+    args.label_dim = len(class_labels_df)
+
+    # Read old class indices
+    old_class_labels_df = pd.read_csv(args.old_class_indices)
+    args.old_label_dim = len(old_class_labels_df)
+
+    class_names = class_labels_df['display_name'].tolist()
+
+    # You can choose to map 'mid' or 'display_name' to the index
+    index_dict = pd.Series(class_labels_df.index.values, index=class_labels_df['mid']).to_dict()
+
+    # Display the first few rows to confirm the structure
+    print("Class labels DataFrame successfully loaded.")
+
+    print(f"Old number of classes: {args.old_label_dim}")
+    print(f"Current number of classes: {args.label_dim}")
+
+except FileNotFoundError:
+    print(f"Error: The file was not found at the specified path: {args.class_indices}")
+    print("Please ensure the file exists and the path is correct.")
+
+os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
 
 # The models appropriate args (some grabbed from EquiAV defaults)
 args.num_mel_bins = 128 # Grabbed from ft_main audio_conf
@@ -138,13 +163,13 @@ def main():
     print('Number of GPUs:', torch.cuda.device_count())
     print('Save path:',args.save_path)
 
-    with open(args.metadata, 'r') as f:
-        data = json.load(f)
+    # with open(args.metadata, 'r') as f:
+    #     data = json.load(f)
 
-    # The JSON you provided has a 'data' key which contains a list of examples.
-    examples = data.get("data", [])
+    # # The JSON you provided has a 'data' key which contains a list of examples.
+    # examples = data.get("data", [])
 
-    args.iteration_per_epoch = len(examples) 
+    args.iteration_per_epoch = 10 # len(examples) 
 
     model = EquiAV_ft(**vars(args))
 
@@ -157,29 +182,11 @@ def main():
     print('\n=================Parameter of the Model=================')
     trainer = ModelTrainer(model, **vars(args))
 
-    class_labels_df = None
-
-    try:
-        # Read the CSV file into a DataFrame
-        # We set the 'index' column as the DataFrame index for direct integer-based lookup
-        class_labels_df = pd.read_csv(args.class_indices, index_col='index')
-
-        class_names = class_labels_df['display_name'].tolist()
-
-        # You can choose to map 'mid' or 'display_name' to the index
-        index_dict = pd.Series(class_labels_df.index.values, index=class_labels_df['mid']).to_dict()
-
-        # Display the first few rows to confirm the structure
-        print("Class labels DataFrame successfully loaded.")
-
-    except FileNotFoundError:
-        print(f"Error: The file was not found at the specified path: {args.class_indices}")
-        print("Please ensure the file exists and the path is correct.")
-
-
     # Load weights, if applicable
     if args.pretrained_model is not None:
         trainer.loadParameters(args.pretrained_model)
+
+    exit()
 
     model.eval()  # switch to eval mode for inference
 
@@ -203,6 +210,8 @@ def main():
         label_data = format_label_data(labels, index_dict, args.label_dim, args.label_smooth)
 
         trainer.train_on_single_pair(a_data, v_data, label_data)
+
+        end_time = time.time()
     
     
     model_save_path = args.model_save_path + f"/online_model-time_{time.time()}"
