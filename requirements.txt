@@ -4,7 +4,8 @@ ffmpeg
 ffprobe
 
 timm==0.4.12
-torchaudio
+torchaudio==2.8.0
+soundfile
 wandb
 scipy
 scikit-learn

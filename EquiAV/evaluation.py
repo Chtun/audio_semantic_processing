@@ -9,7 +9,6 @@ import json
 import os
 
 # Step 1: Instantiate the model with appropriate args (some grabbed from EquiAV defaults)
-label_dim = 21 # 21 target classes for AudioSet_20K_Targeted
 num_mel_bins = 128 # Grabbed from ft_main audio_conf
 target_length = 1024 # Grabbed from ft_main audio_conf
 norm_mean = -4.346 # Grabbed from ft_main audio_conf
@@ -17,24 +16,16 @@ norm_std = 4.332 # Grabbed from ft_main audio_conf
 
 head_type = "linear" # Head type is linear from ft model
 ftmode = "audio_only" # Fine tune was done on audio only
+device = 'cpu' # The device to use
 
 # Paths to model and evaluation metadata
-model_path = "/content/drive/MyDrive/audio_data/EquiAV_finetuned-target_classes/model/model_bestLoss_ft.pth"
-eval_metadata_path = "/content/audio_semantic_processing/EquiAV/datasets/dataprep/AudioSet_20K_Targeted/test.json"
-class_indices_path = "/content/audio_semantic_processing/EquiAV/datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv"
+model_path = "./pretrained_weights/online_model/model/online_model-time_1758135426.9473093.pth"
+eval_metadata_path = "./datasets/dataprep/AudioSet_20K_Targeted/test.json"
+class_indices_path = "./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices-online_1.csv"
 
 # Folder to save confusion matrix to.
 save_folder_path = "/content/output"
 os.makedirs(save_folder_path, exist_ok=True)
-
-model = MainModel(
-  label_dim=label_dim,
-  num_mel_bins=num_mel_bins,
-  drop_out=0.0,
-  drop_path=0.0,
-  head_type=head_type,
-  ftmode=ftmode
-)
 
 try:
     # Read the CSV file into a DataFrame
@@ -43,16 +34,29 @@ try:
 
     class_names = class_labels_df['display_name'].tolist()
 
+    label_dim = len(class_labels_df)
+
     # Display the first few rows to confirm the structure
     print("Class labels DataFrame successfully loaded.")
+    print()
 
 except FileNotFoundError:
     print(f"Error: The file was not found at the specified path: {class_indices_path}")
     print("Please ensure the file exists and the path is correct.")
 
 
+model = MainModel(
+  label_dim=label_dim,
+  num_mel_bins=num_mel_bins,
+  drop_out=0.0,
+  drop_path=0.0,
+  head_type=head_type,
+  ftmode=ftmode,
+)
+print()
+
 # Load state_dict from .pth file
-checkpoint = torch.load(model_path, map_location="cuda")
+checkpoint = torch.load(model_path, map_location=device)
 
 # If the checkpoint is a state_dict
 if 'state_dict' in checkpoint:
@@ -73,6 +77,7 @@ missing, unexpected = model.load_state_dict(new_state_dict, strict=False)
 print("Missing keys:", missing)
 print("Unexpected keys:", unexpected)
 
+
 model.eval()  # switch to eval mode for inference
 
 with open(eval_metadata_path, 'r') as f:
@@ -89,7 +94,6 @@ with open(eval_metadata_path, 'r') as f:
 
   for class_name in class_names:
     confusion_matrix[class_name] = {}
-    print(class_name)
     for other_class_name in class_names:
       confusion_matrix[class_name][other_class_name] = 0
 
@@ -139,8 +143,8 @@ with open(eval_metadata_path, 'r') as f:
         for ground_truth_label in ground_truth_label_names:
           confusion_matrix[ground_truth_label][predicted_label] += 1
 
-    for ground_turth_label in ground_truth_label_names:
-      confusion_matrix[ground_turth_label]["Total_Positive_Examples"] += 1
+    for ground_truth_label in ground_truth_label_names:
+      confusion_matrix[ground_truth_label]["Total_Positive_Examples"] += 1
 
     print()
 

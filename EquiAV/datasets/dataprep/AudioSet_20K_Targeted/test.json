@@ -5,7 +5,7 @@
             "start_seconds": 30.0,
             "end_seconds": 40.0,
             "positive_labels": "/m/03wwcy,/m/04rlf",
-            "wav": "../EquiAV/datasets/AudioSet/test/0oudYrPGNN8_30.0-40.0.wav",
+            "wav": "./datasets/AudioSet/test/0oudYrPGNN8_30.0-40.0.wav",
             "video_id": "0oudYrPGNN8_30.0-40.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf"
@@ -15,7 +15,7 @@
             "start_seconds": 20.0,
             "end_seconds": 30.0,
             "positive_labels": "/m/03wwcy",
-            "wav": "../EquiAV/datasets/AudioSet/test/WubFWxjQrC4_20.0-30.0.wav",
+            "wav": "./datasets/AudioSet/test/WubFWxjQrC4_20.0-30.0.wav",
             "video_id": "WubFWxjQrC4_20.0-30.0",
             "video_path": "",
             "labels": "/m/03wwcy"
@@ -25,7 +25,7 @@
             "start_seconds": 1.0,
             "end_seconds": 11.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/04szw",
-            "wav": "../EquiAV/datasets/AudioSet/test/Gl4VW2wZcuM_1.0-11.0.wav",
+            "wav": "./datasets/AudioSet/test/Gl4VW2wZcuM_1.0-11.0.wav",
             "video_id": "Gl4VW2wZcuM_1.0-11.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf"
@@ -35,7 +35,7 @@
             "start_seconds": 1.0,
             "end_seconds": 11.0,
             "positive_labels": "/m/03wwcy",
-            "wav": "../EquiAV/datasets/AudioSet/test/t-CiLzdNecs_1.0-11.0.wav",
+            "wav": "./datasets/AudioSet/test/t-CiLzdNecs_1.0-11.0.wav",
             "video_id": "t-CiLzdNecs_1.0-11.0",
             "video_path": "",
             "labels": "/m/03wwcy"
@@ -45,7 +45,7 @@
             "start_seconds": 0.0,
             "end_seconds": 10.0,
             "positive_labels": "/m/03wwcy,/m/09x0r,/m/0dv3j",
-            "wav": "../EquiAV/datasets/AudioSet/test/UbyMM3iddJA_0.0-10.0.wav",
+            "wav": "./datasets/AudioSet/test/UbyMM3iddJA_0.0-10.0.wav",
             "video_id": "UbyMM3iddJA_0.0-10.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/09x0r"
@@ -55,7 +55,7 @@
             "start_seconds": 50.0,
             "end_seconds": 60.0,
             "positive_labels": "/m/03wwcy,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/test/kzB1fnjEX0I_50.0-60.0.wav",
+            "wav": "./datasets/AudioSet/test/kzB1fnjEX0I_50.0-60.0.wav",
             "video_id": "kzB1fnjEX0I_50.0-60.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/09x0r"
@@ -65,7 +65,7 @@
             "start_seconds": 10.0,
             "end_seconds": 20.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/09x0r,/t/dd00125",
-            "wav": "../EquiAV/datasets/AudioSet/test/Gc01CEIQnM0_10.0-20.0.wav",
+            "wav": "./datasets/AudioSet/test/Gc01CEIQnM0_10.0-20.0.wav",
             "video_id": "Gc01CEIQnM0_10.0-20.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r,/t/dd00125"
@@ -75,7 +75,7 @@
             "start_seconds": 0.0,
             "end_seconds": 8.0,
             "positive_labels": "/m/03wwcy,/m/07pp_mv",
-            "wav": "../EquiAV/datasets/AudioSet/test/uA3bpAQV_hE_0.0-8.0.wav",
+            "wav": "./datasets/AudioSet/test/uA3bpAQV_hE_0.0-8.0.wav",
             "video_id": "uA3bpAQV_hE_0.0-8.0",
             "video_path": "",
             "labels": "/m/03wwcy"

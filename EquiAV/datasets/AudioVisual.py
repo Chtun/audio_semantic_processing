@@ -9,7 +9,7 @@ import numpy as np
 
 import torch
 import torchaudio
-import torch.nn.functional
+import soundfile as sf
 import torchvision.transforms as T
 from torch.utils.data import Dataset
 from torchvision.transforms import functional as F
@@ -115,6 +115,34 @@ class GaussianBlur(object):
         x = x.filter(ImageFilter.GaussianBlur(radius=sigma))
         return x
 
+import soundfile as sf
+import torch
+import numpy as np
+
+def load_audio(file_path):
+    """
+    Replacement for torchaudio.load using soundfile.
+    
+    Returns:
+        waveform (Tensor[channels, time], float32, range [-1, 1])
+        sample_rate (int)
+    """
+    # Read the file with soundfile (dtype inferred automatically)
+    waveform_np, sr = sf.read(file_path, always_2d=True)  # ensures shape [samples, channels]
+
+    # If integer PCM, normalize to [-1, 1]
+    if np.issubdtype(waveform_np.dtype, np.integer):
+        max_val = np.iinfo(waveform_np.dtype).max
+        waveform_np = waveform_np.astype('float32') / max_val
+    else:
+        waveform_np = waveform_np.astype('float32')  # float WAVs stay float32
+
+    # Transpose to [channels, time] for PyTorch
+    waveform = torch.from_numpy(waveform_np.T)
+
+    return waveform, sr
+
+
 def wav2fbank(file_path: str, target_length: int, num_mel_bins: int):
         """
         Static function to get fbank from input wav file name.
@@ -126,7 +154,7 @@ def wav2fbank(file_path: str, target_length: int, num_mel_bins: int):
             
         """
 
-        waveform, sr = torchaudio.load(file_path)
+        waveform, sr = load_audio(file_path)
         waveform = waveform - waveform.mean()
 
         try:
@@ -292,7 +320,7 @@ class MainDataset(Dataset):
 
     def _wav2fbank(self, filename, filename2=None, mix_lambda=-1):
         # Load and convert to mono immediately
-        waveform1, sr = torchaudio.load(filename)
+        waveform1, sr = load_audio(filename)
         if waveform1.shape[0] > 1:
             waveform1 = torch.mean(waveform1, dim=0, keepdim=True)
 
@@ -301,7 +329,7 @@ class MainDataset(Dataset):
             waveform = waveform1 - waveform1.mean()
         # mixup
         else:
-            waveform2, _ = torchaudio.load(filename2)
+            waveform2, _ = load_audio(filename2)
             if waveform2.shape[0] > 1:
                 waveform2 = torch.mean(waveform2, dim=0, keepdim=True)
 

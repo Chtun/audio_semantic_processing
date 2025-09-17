@@ -327,9 +327,6 @@ class ModelTrainer(nn.Module):
         video_data = video_data.unsqueeze(0) if video_data.dim() == 3 else video_data
         label_data = label_data.unsqueeze(0) if label_data.dim() == 1 else label_data
 
-
-        print("Next data is training!") # This print will now happen for the single pair
-
         # ==================== FORWARD PASS ====================
         with autocast(enabled=self.mixedprec):
             loss_dict, outputs = self.__model__(audio_data, video_data, labels=label_data)

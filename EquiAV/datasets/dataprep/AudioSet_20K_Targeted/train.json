@@ -5,7 +5,7 @@
             "start_seconds": 110.0,
             "end_seconds": 120.0,
             "positive_labels": "/m/03wwcy,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/7eS9i_O3L4s_110.0-120.0.wav",
+            "wav": "./datasets/AudioSet/train/7eS9i_O3L4s_110.0-120.0.wav",
             "video_id": "7eS9i_O3L4s_110.0-120.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/09x0r"
@@ -15,7 +15,7 @@
             "start_seconds": 5.0,
             "end_seconds": 15.0,
             "positive_labels": "/m/03wwcy",
-            "wav": "../EquiAV/datasets/AudioSet/train/n0bxoidaVzs_5.0-15.0.wav",
+            "wav": "./datasets/AudioSet/train/n0bxoidaVzs_5.0-15.0.wav",
             "video_id": "n0bxoidaVzs_5.0-15.0",
             "video_path": "",
             "labels": "/m/03wwcy"
@@ -25,7 +25,7 @@
             "start_seconds": 420.0,
             "end_seconds": 430.0,
             "positive_labels": "/m/03wwcy,/m/07r67yg,/m/0bt9lr,/m/0jbk",
-            "wav": "../EquiAV/datasets/AudioSet/train/Lgf99OrWOVM_420.0-430.0.wav",
+            "wav": "./datasets/AudioSet/train/Lgf99OrWOVM_420.0-430.0.wav",
             "video_id": "Lgf99OrWOVM_420.0-430.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/0bt9lr"
@@ -35,7 +35,7 @@
             "start_seconds": 350.0,
             "end_seconds": 360.0,
             "positive_labels": "/m/03wwcy,/t/dd00125",
-            "wav": "../EquiAV/datasets/AudioSet/train/HoBWL3qAnGU_350.0-360.0.wav",
+            "wav": "./datasets/AudioSet/train/HoBWL3qAnGU_350.0-360.0.wav",
             "video_id": "HoBWL3qAnGU_350.0-360.0",
             "video_path": "",
             "labels": "/m/03wwcy,/t/dd00125"
@@ -45,7 +45,7 @@
             "start_seconds": 550.0,
             "end_seconds": 560.0,
             "positive_labels": "/m/03wwcy",
-            "wav": "../EquiAV/datasets/AudioSet/train/ylADXwDnjwY_550.0-560.0.wav",
+            "wav": "./datasets/AudioSet/train/ylADXwDnjwY_550.0-560.0.wav",
             "video_id": "ylADXwDnjwY_550.0-560.0",
             "video_path": "",
             "labels": "/m/03wwcy"
@@ -55,7 +55,7 @@
             "start_seconds": 30.0,
             "end_seconds": 40.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/04szw,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/pfpnTPHI-n0_30.0-40.0.wav",
+            "wav": "./datasets/AudioSet/train/pfpnTPHI-n0_30.0-40.0.wav",
             "video_id": "pfpnTPHI-n0_30.0-40.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r"
@@ -65,7 +65,7 @@
             "start_seconds": 40.0,
             "end_seconds": 50.0,
             "positive_labels": "/m/03wwcy,/m/04rlf",
-            "wav": "../EquiAV/datasets/AudioSet/train/0kvWlnYuCvI_40.0-50.0.wav",
+            "wav": "./datasets/AudioSet/train/0kvWlnYuCvI_40.0-50.0.wav",
             "video_id": "0kvWlnYuCvI_40.0-50.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf"
@@ -75,7 +75,7 @@
             "start_seconds": 10.0,
             "end_seconds": 20.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/07r67yg",
-            "wav": "../EquiAV/datasets/AudioSet/train/U10g6Ou2A58_10.0-20.0.wav",
+            "wav": "./datasets/AudioSet/train/U10g6Ou2A58_10.0-20.0.wav",
             "video_id": "U10g6Ou2A58_10.0-20.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf"
@@ -85,7 +85,7 @@
             "start_seconds": 0.0,
             "end_seconds": 10.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/aq4AoJ0PlHI_0.0-10.0.wav",
+            "wav": "./datasets/AudioSet/train/aq4AoJ0PlHI_0.0-10.0.wav",
             "video_id": "aq4AoJ0PlHI_0.0-10.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r"
@@ -95,7 +95,7 @@
             "start_seconds": 200.0,
             "end_seconds": 210.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/xnwwsEEJvdk_200.0-210.0.wav",
+            "wav": "./datasets/AudioSet/train/xnwwsEEJvdk_200.0-210.0.wav",
             "video_id": "xnwwsEEJvdk_200.0-210.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r"
@@ -105,7 +105,7 @@
             "start_seconds": 120.0,
             "end_seconds": 130.0,
             "positive_labels": "/m/03wwcy,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/hjXNxmWySRY_120.0-130.0.wav",
+            "wav": "./datasets/AudioSet/train/hjXNxmWySRY_120.0-130.0.wav",
             "video_id": "hjXNxmWySRY_120.0-130.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/09x0r"
@@ -115,7 +115,7 @@
             "start_seconds": 10.0,
             "end_seconds": 20.0,
             "positive_labels": "/m/03wwcy,/t/dd00125",
-            "wav": "../EquiAV/datasets/AudioSet/train/wum-4N5x8fo_10.0-20.0.wav",
+            "wav": "./datasets/AudioSet/train/wum-4N5x8fo_10.0-20.0.wav",
             "video_id": "wum-4N5x8fo_10.0-20.0",
             "video_path": "",
             "labels": "/m/03wwcy,/t/dd00125"
@@ -125,7 +125,7 @@
             "start_seconds": 210.0,
             "end_seconds": 220.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/09x0r,/t/dd00125",
-            "wav": "../EquiAV/datasets/AudioSet/train/kstzPdxjnzQ_210.0-220.0.wav",
+            "wav": "./datasets/AudioSet/train/kstzPdxjnzQ_210.0-220.0.wav",
             "video_id": "kstzPdxjnzQ_210.0-220.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r,/t/dd00125"
@@ -135,7 +135,7 @@
             "start_seconds": 10.0,
             "end_seconds": 20.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/3BcwNM72zcQ_10.0-20.0.wav",
+            "wav": "./datasets/AudioSet/train/3BcwNM72zcQ_10.0-20.0.wav",
             "video_id": "3BcwNM72zcQ_10.0-20.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r"
@@ -145,7 +145,7 @@
             "start_seconds": 30.0,
             "end_seconds": 40.0,
             "positive_labels": "/m/03wwcy,/m/04rlf,/m/07r67yg,/m/09x0r",
-            "wav": "../EquiAV/datasets/AudioSet/train/zNvgZ5QPAFI_30.0-40.0.wav",
+            "wav": "./datasets/AudioSet/train/zNvgZ5QPAFI_30.0-40.0.wav",
             "video_id": "zNvgZ5QPAFI_30.0-40.0",
             "video_path": "",
             "labels": "/m/03wwcy,/m/04rlf,/m/09x0r"
