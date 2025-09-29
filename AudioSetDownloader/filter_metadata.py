@@ -81,8 +81,8 @@ def filter_label_in_metadata(json_filepath, label_ids: list):
 class_indices_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices-online_1.csv"
 label_ids = grab_label_ids(class_indices_path)
 
-train_metadata_path = "../EquiAV/datasets/AudioSet/train_metadata.json"
+train_metadata_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/train.json"
 filter_label_in_metadata(train_metadata_path, label_ids)
 
-eval_metadata_path = "../EquiAV/datasets/AudioSet/test_metadata.json"
+eval_metadata_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/test.json"
 filter_label_in_metadata(eval_metadata_path, label_ids)

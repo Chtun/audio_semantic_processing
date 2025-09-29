@@ -2,6 +2,9 @@ from Downloader import *
 
 download_path = "..\\EquiAV\\datasets\\AudioSet"
 
+num_train_examples_per_class = 200
+num_validation_examples_per_class = 30
+
 d_train = Downloader(
   root_path=download_path,
   labels=[
@@ -36,34 +39,34 @@ d_train = Downloader(
 d_train.download(
   save_folder_name="train",
   format='wav',
-  max_labels_per_class=20,
+  max_labels_per_class=num_train_examples_per_class,
   seed=10
 )
 
 d_test = Downloader(
   root_path=download_path,
   labels=[
-          # "Speech",
-          # "Male speech, man speaking",
-          # "Female speech, woman speaking",
-          # "Walk, footsteps",
-          # "Breathing",
-          # "Cough",
-          # "Dog",
-          # "Cat",
-          # "Bark",
-          # "Meow",
-          # "Inside, small room",
-          # "Water",
-          # "Water tap, faucet",
-          # "Toilet flush",
-          # "Sink (filling or washing)",
-          # "Music",
-          # "Vacuum cleaner",
-          # "Microwave oven",
-          # "Dishes, pots, and pans",
-          # "Door",
-          # "Television",
+          "Speech",
+          "Male speech, man speaking",
+          "Female speech, woman speaking",
+          "Walk, footsteps",
+          "Breathing",
+          "Cough",
+          "Dog",
+          "Cat",
+          "Bark",
+          "Meow",
+          "Inside, small room",
+          "Water",
+          "Water tap, faucet",
+          "Toilet flush",
+          "Sink (filling or washing)",
+          "Music",
+          "Vacuum cleaner",
+          "Microwave oven",
+          "Dishes, pots, and pans",
+          "Door",
+          "Television",
           "Doorbell"
           ],
   n_jobs=16,
@@ -74,6 +77,6 @@ d_test = Downloader(
 d_test.download(
   save_folder_name="test",
   format='wav',
-  max_labels_per_class=10,
+  max_labels_per_class=num_validation_examples_per_class,
   seed=100
 )

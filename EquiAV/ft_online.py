@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(description = "TrainArgs")
 parser.add_argument('--device', type=str,   default='cpu',   help='The type of device to use')
 parser.add_argument('--gpu', type=int,   default=0,   help='gpu id to use')
 
-## Data definition
+# Data definition
 parser.add_argument('--dataset', type=str, default="AudioSet_20K_Targeted", help="The type of datset being used.")
 parser.add_argument('--metadata',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/train.json", help='Path of dataset metadata.')
 parser.add_argument('--class_indices',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv", help='Path of dataset class index mapping.')
@@ -38,16 +38,16 @@ parser.add_argument('--ft_freqm', type=int, default=48, help='frequency mask max
 parser.add_argument('--ft_timem', type=int, default=192, help='time mask max length')
 parser.add_argument('--label_smooth', type=float, default=0.0, help='label smoothing')
 
-## Data loader details
+# Data loader details
 parser.add_argument('--batch_size', type=int,   default=1,    help='Batch size, number of speakers per batch')
 parser.add_argument('--nDataLoaderThread', type=int, default=8,     help='Number of loader threads')
 parser.add_argument('--checkloader', dest='checkloader', action='store_true', help='check the dataloders')
 
-## Training details
+# Training details
 parser.add_argument('--max_epoch', type=int,    default=5,          help='Maximum number of epochs')
 parser.add_argument('--trainfunc_ft', type=str,    default="bceloss",   help='Finetuning loss function')
 
-## Model definition
+# Model definition
 parser.add_argument('--model', type=str,   default="ft_EquiAV",   help='Name of model definition')
 parser.add_argument('--inter_linear',     type=bool,  default=True,      help='Use the linear head for extracting invariant representation')
 parser.add_argument('--head_type',     type=str,  default='linear', choices=['linear', 'mlp'],      help='Head type (linear or mlp)')
@@ -62,11 +62,11 @@ parser.add_argument("--ftmode", type=str, default='audio_only', help="how to fin
 parser.add_argument('--data_aug',      type=lambda x:bool(distutils.util.strtobool(x)),  default=False,  help='Enable data_aug')
 
 
-## Optimizer details
+# Optimizer details
 parser.add_argument('--optimizer', type=str,   default="adamw", help='sgd or adam')
 parser.add_argument('--weight_decay', type=float, default=1e-5, help='Weight decay in the optimizer')
 
-## Learning rate details
+# Learning rate details
 parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
 parser.add_argument("--head_lr", type=float, default=1e-4, help="learning rate ratio the newly initialized layers / pretrained weights")
 parser.add_argument("--start_lr", type=float, default=2e-7, help="start point of learning rate")
@@ -82,12 +82,12 @@ parser.add_argument('--model_save_freq',     type=int, default=2, help='Frequenc
 
 parser.add_argument('--pretrained_model', type=str, default="./pretrained_weights/online_model/model/model_bestLoss_ft.pth", help='pretrained model weights for finetuning')
 
-## Accelerate training
+# Accelerate training
 parser.add_argument('--port', type=str,default="8008", help='Port for distributed training, input as text')
 parser.add_argument('--distributed',    type=lambda x:bool(distutils.util.strtobool(x)), default=True, help='Enable distributed training')
 parser.add_argument('--mixedprec',      type=lambda x:bool(distutils.util.strtobool(x)),  default=True,  help='Enable mixed precision training')
 
-## Logging
+# Logging
 parser.add_argument('--no_wandb', action='store_true', help='Disable WandB logging')
 parser.add_argument('--wandb_entity', type=str, default=None, help='wandb entity')
 parser.add_argument('--wandb_name', type=str, default=None, help='wandb entity')

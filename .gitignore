@@ -161,4 +161,5 @@ cython_debug/
 
 EquiAV/pretrained_weights/
 EquiAV/datasets/AudioSet/
+EquiAV/datasets/Xiao-data_10/
 output/

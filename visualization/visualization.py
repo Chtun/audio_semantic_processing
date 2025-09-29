@@ -6,14 +6,14 @@ import os
 import csv
 
 # Load CSV
-output_dir = "C:\\Users\\chtun\\OneDrive\\Documents\\GitHub_Projects\\audio_semantic_processing\\output"
-input_dir = "C:\\Users\\chtun\\OneDrive\\Documents\\GitHub_Projects\\audio_semantic_processing\\output"
+output_dir = "..\\output\\experiments"
+input_dir = "..\\output\\experiments"
 
-confusion_matrix_path = os.path.join(input_dir, "confusion_matrix-raspberry_pi_4.csv")
-confusion_matrix_image_path = os.path.join(output_dir, "confusion_matrix-raspberry_pi_4.jpg")
+confusion_matrix_path = os.path.join(input_dir, "confusion_matrix.csv")
+confusion_matrix_image_path = os.path.join(output_dir, "confusion_matrix.jpg")
 
-inference_times_path = os.path.join(input_dir, "inference_times-raspberry_pi_4.csv")
-inference_times_image_path = os.path.join(output_dir, "inference_times-raspberry_pi_4.jpg")
+inference_times_path = os.path.join(input_dir, "inference_times.csv")
+inference_times_image_path = os.path.join(output_dir, "inference_times.jpg")
 
 df = pd.read_csv(confusion_matrix_path, index_col=0)
 

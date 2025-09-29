@@ -48,12 +48,12 @@ def change_metadata_paths(json_filepath, base_path: str):
         print(f"An unexpected error occurred while processing {json_filepath}: {e}")
 
 
-base_train_path = "./datasets/AudioSet/train/"
+base_train_path = "./datasets/Xiao-data_10/"
 
-train_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/train.json"
-change_metadata_paths(train_path, base_path=base_train_path)
+# train_path = "../EquiAV/datasets/dataprep/Xiao_Experiments/train.json"
+# change_metadata_paths(train_path, base_path=base_train_path)
 
 
-base_test_path = "./datasets/AudioSet/test/"
-test_path = "../EquiAV/datasets/dataprep/AudioSet_20K_Targeted/test.json"
+base_test_path = "./datasets/Xiao-data_10/"
+test_path = "../EquiAV/datasets/dataprep/Xiao_Experiments/test.json"
 change_metadata_paths(test_path, base_path=base_test_path)

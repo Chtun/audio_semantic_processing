@@ -19,12 +19,12 @@ ftmode = "audio_only" # Fine tune was done on audio only
 device = 'cpu' # The device to use
 
 # Paths to model and evaluation metadata
-model_path = "./pretrained_weights/online_model/model/online_model-time_1758135426.9473093.pth"
-eval_metadata_path = "./datasets/dataprep/AudioSet_20K_Targeted/test.json"
-class_indices_path = "./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices-online_1.csv"
+model_path = "./pretrained_weights/online_model/model/model_bestLoss_ft.pth"
+eval_metadata_path = "./datasets/dataprep/Xiao_Experiments/test.json"
+class_indices_path = "./datasets/dataprep/Xiao_Experiments/class_labels_indices.csv"
 
 # Folder to save confusion matrix to.
-save_folder_path = "/content/output"
+save_folder_path = "../output/experiments"
 os.makedirs(save_folder_path, exist_ok=True)
 
 try:
