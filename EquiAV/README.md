@@ -9,6 +9,126 @@
 This folder contains a re-implementation of the EquiAV model, configured for learning audio event classification for a distributed system in the home.
 
 ## Getting Started
+
+### API
+
+To utilize the API for inference using the EquiAV model, first install the requirements using:
+
+```
+pip install -r requirements.txt
+```
+
+Then, build the package using:
+
+```
+pip install -e .
+```
+
+Then, in your scripts, the API functions is accessible under 'EquiAV.inference'. For example, here is a script that can be used, once metadata, class_indices_path, and weights_path have been configured for the proper dataset and fine-tuned weights:
+
+```
+import sys
+import json
+import csv
+import argparse
+
+from EquiAV.inference import load_audio_model, audio_event_classification
+
+## ===== ===== ===== ===== ===== ===== ===== =====
+## Parse arguments
+## ===== ===== ===== ===== ===== ===== ===== =====
+
+parser = argparse.ArgumentParser(description = "TrainArgs")
+
+parser.add_argument('--device', type=str,   default='cpu',   help="The type of device to use.")
+parser.add_argument('--modality_mode', type=str, default="audio_only", help="The modality mode (audio_only, video_only, multimodal) for the model.")
+parser.add_argument('--head_type', type=str, default="linear", help="The type of layer to use for the classification head (linear, mlp)")
+
+# Data path configurations
+parser.add_argument('--metadata',type=str, default="./datasets/dataprep/Xiao_Experiments/test.json", help="Path of dataset metadata.")
+parser.add_argument('--class_indices_path', type=str, default="./datasets/dataprep/Xiao_Experiments/class_labels_indices.csv", help="The path to the .csv that maps label ID to its index.")
+parser.add_argument('--weights_path', type=str, default="./pretrained_weights/online_model/model/model_bestLoss_ft.pth", help="The path to the EquiAV model weights.")
+
+# Audio parsing configurations (Recommend not touching).
+parser.add_argument('--num_mel_bins', type=int, default=128, help="The number of bins for the mel spectrogram.")
+parser.add_argument('--target_length', type=int, default=1024, help="The maximum length of the audio.")
+parser.add_argument('--norm_mean', type=int, default=-4.346, help="The mean of the audio values for normalization.")
+parser.add_argument('--norm_std', type=int, default=4.332, help="The standard deviation of the audio values for normalization.")
+
+# Output configurations
+parser.add_argument('--output_csv_path', type=str, default="../output/experiments/predictions.csv", help="The output path for the .csv file of predictions for each example.")
+
+args = parser.parse_args()
+
+
+def main():
+
+    # ----------------------------
+    # Load evaluation metadata
+    # ----------------------------
+    with open(args.metadata, 'r') as f:
+        data = json.load(f)
+        examples = data.get("data", [])
+        if not examples:
+            print("No examples found in JSON.")
+            sys.exit(1)
+    
+    wav_files = {}
+
+    for example in examples:
+        id = example.get("video_id")
+        wav_file_path = example.get("wav")
+        wav_files[id] = wav_file_path
+
+    # ----------------------------
+    # Load the model
+    # ----------------------------
+    model, class_labels_df = load_audio_model(args.class_indices_path, args.weights_path, args.device, args.head_type, args.modality_mode, args.num_mel_bins)
+
+    # ----------------------------
+    # Run inference
+    # ----------------------------
+    results, inference_times = audio_event_classification(
+        wav_files,
+        model,
+        class_labels_df,
+        args.target_length,
+        args.num_mel_bins,
+        args.norm_mean,
+        args.norm_std
+    )
+
+    # ----------------------------
+    # Reformat results for writing to CSV
+    # ----------------------------
+    reformatted_results = {}
+    for id in results.keys():
+        reformatted_results[id] = ",".join(results[id])
+
+    # ----------------------------
+    # Save predictions to CSV
+    # ----------------------------
+    with open(args.output_csv_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=["video_id", "predicted_label"])
+        writer.writeheader()
+        writer.writerows(reformatted_results)
+
+    print(f"Saved predictions for {len(reformatted_results)} examples to {args.output_csv_path}")
+
+    # ----------------------------
+    # Print/save inference times
+    # ----------------------------
+    average_time = sum(inference_times.values()) / len(inference_times)
+    print(f"Average inference time per example: {average_time:.4f} seconds")
+
+if __name__ == '__main__':
+    main()
+
+```
+
+For the proper weights for our fine-tuned model for audio data on household events, please download from [here](https://drive.google.com/file/d/13qiy-7yPHrcXIUGo8Kv9l8gYnR842uVU/view?usp=drive_link). For the class indices for the targeted 21 classes of household events used to fine-tune this model, please download the class indices .csv from [here](https://drive.google.com/file/d/1ZMMF3QuTK6SNzN5dx6hN5Gt9J8vCVnb2/view?usp=drive_link).
+
+
 ### 1. Prepare Environment & Dataset
 Create conda environment
 ```

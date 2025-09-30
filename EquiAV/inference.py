@@ -198,7 +198,7 @@ def main():
         args.norm_std
     )
 
-        # ----------------------------
+    # ----------------------------
     # Reformat results for writing to CSV
     # ----------------------------
     reformatted_results = {}
