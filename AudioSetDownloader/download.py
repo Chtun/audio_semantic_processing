@@ -5,35 +5,37 @@ download_path = "..\\EquiAV\\datasets\\AudioSet"
 num_train_examples_per_class = 200
 num_validation_examples_per_class = 30
 
+class_labels = [
+  "Speech",
+  "Male speech, man speaking",
+  "Female speech, woman speaking",
+  "Walk, footsteps",
+  "Breathing",
+  "Cough",
+  "Dog",
+  "Cat",
+  "Bark",
+  "Meow",
+  "Inside, small room",
+  "Water",
+  "Water tap, faucet",
+  "Toilet flush",
+  "Sink (filling or washing)",
+  "Music",
+  "Vacuum cleaner",
+  "Microwave oven",
+  "Dishes, pots, and pans",
+  "Door",
+  "Television",
+  "Doorbell"
+]
+
 d_train = Downloader(
   root_path=download_path,
-  labels=[
-          # "Speech",
-          # "Male speech, man speaking",
-          # "Female speech, woman speaking",
-          # "Walk, footsteps",
-          # "Breathing",
-          # "Cough",
-          # "Dog",
-          # "Cat",
-          # "Bark",
-          # "Meow",
-          # "Inside, small room",
-          # "Water",
-          # "Water tap, faucet",
-          # "Toilet flush",
-          # "Sink (filling or washing)",
-          # "Music",
-          # "Vacuum cleaner",
-          # "Microwave oven",
-          # "Dishes, pots, and pans",
-          # "Door",
-          # "Television",
-          "Doorbell"
-          ],
+  labels=class_labels,
   n_jobs=16,
   download_type='unbalanced_train',
-  copy_and_replicate="False",
+  copy_and_replicate=False,
 )
 
 d_train.download(
@@ -45,33 +47,10 @@ d_train.download(
 
 d_test = Downloader(
   root_path=download_path,
-  labels=[
-          "Speech",
-          "Male speech, man speaking",
-          "Female speech, woman speaking",
-          "Walk, footsteps",
-          "Breathing",
-          "Cough",
-          "Dog",
-          "Cat",
-          "Bark",
-          "Meow",
-          "Inside, small room",
-          "Water",
-          "Water tap, faucet",
-          "Toilet flush",
-          "Sink (filling or washing)",
-          "Music",
-          "Vacuum cleaner",
-          "Microwave oven",
-          "Dishes, pots, and pans",
-          "Door",
-          "Television",
-          "Doorbell"
-          ],
+  labels=class_labels,
   n_jobs=16,
   download_type='eval',
-  copy_and_replicate="False",
+  copy_and_replicate=False,
 )
 
 d_test.download(

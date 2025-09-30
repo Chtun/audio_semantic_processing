@@ -280,3 +280,6 @@ class MainModel(nn.Module):
             x = self.mlp_head(v.mean(dim=1))
 
             return x
+
+        else:
+            raise ValueError(f"The ftmode: {self.ftmode} is not recognized!")

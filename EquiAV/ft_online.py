@@ -4,7 +4,6 @@ import torch
 import distutils
 import json
 import pandas as pd
-import torchaudio
 
 from datasets.AudioVisual import format_model_input, format_label_data
 from ft_trainer import *
