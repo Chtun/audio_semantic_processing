@@ -29,7 +29,7 @@ parser.add_argument('--weights_path', type=str, default="./pretrained_weights/on
 # Audio parsing configurations (Recommend not touching).
 parser.add_argument('--num_mel_bins', type=int, default=128, help="The number of bins for the mel spectrogram.")
 parser.add_argument('--target_length', type=int, default=1024, help="The maximum length of the audio.")
-parser.add_argument('--norm_mean', type=int, default=-4.346, help="The meal of the audio values for normalization.")
+parser.add_argument('--norm_mean', type=int, default=-4.346, help="The mean of the audio values for normalization.")
 parser.add_argument('--norm_std', type=int, default=4.332, help="The standard deviation of the audio values for normalization.")
 
 # Output configurations
@@ -115,10 +115,10 @@ def audio_event_classification(
         wav_files: A dictionary of ID to wav file path pairings.
         model: The EquiAV model.
         class_labels_df: The dataframe of the class (label) name to index pairings.
-        target_length:
+        target_length: The maximum length of the audio.
         num_mel_bins: The number of bins for the mel spectrogram.
-        norm_mean:
-        norm_std: 
+        norm_mean: The mean of the audio values for normalization.
+        norm_std: The standard deviation of the audio values for normalization.
 
     Returns:
         1. A dictionary of ID to predicted classes for each wav file.
