@@ -101,6 +101,15 @@ python ft_main.py \
 
 ### 3. Inference
 
-Use the script below to perform inference on a specified audio clip:
+Use the script below to perform inference on a set of specified audio clips:
 
 
+```
+python inference.py \
+    --model 'ft_EquiAV' \
+    --weights_path [path to EquiAV weights] \
+    --metadata [path to metadata of audio and video files] \
+    --class_indices_path [path to class (label) name to index pairings] \
+    --modality_mode 'audio_only' \
+    --output_csv_path [path to save csv of inference results]
+```
