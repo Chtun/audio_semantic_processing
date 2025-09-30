@@ -15,7 +15,7 @@ import argparse
 ## Parse arguments
 ## ===== ===== ===== ===== ===== ===== ===== =====
 
-parser = argparse.ArgumentParser(description = "TrainArgs")
+parser = argparse.ArgumentParser(description = "InferenceArgs")
 
 parser.add_argument('--device', type=str,   default='cpu',   help="The type of device to use.")
 parser.add_argument('--modality_mode', type=str, default="audio_only", help="The modality mode (audio_only, video_only, multimodal) for the model.")
