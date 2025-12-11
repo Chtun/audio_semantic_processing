@@ -23,8 +23,8 @@ parser.add_argument('--gpu', type=int,   default=0,   help='gpu id to use')
 # Data definition
 parser.add_argument('--dataset', type=str, default="AudioSet_20K_Targeted", help="The type of datset being used.")
 parser.add_argument('--metadata',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/train.json", help='Path of dataset metadata.')
-parser.add_argument('--class_indices',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv", help='Path of dataset class index mapping.')
-parser.add_argument('--old_class_indices', type=str, default='./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv')
+parser.add_argument('--class_indices',type=str, default="./datasets/dataprep/AudioSet_20K_Targeted/class_labels_indices.csv", help='Path of the  current dataset class index mapping.')
+parser.add_argument('--old_class_indices', type=str, default='DEFAULT', help="Path of prior class index mapping for old model, if using new mapping.")
 parser.add_argument('--fold',type=str, default="1", help='name of dataset definition')
 parser.add_argument("--bal", type=lambda x:bool(distutils.util.strtobool(x)),  default=False, help="weight sampling for class balance ex) 'bal'")
 
@@ -102,7 +102,13 @@ label_metric = {'AudioSet_2M':'mAP',
              'AudioSet_20K_Targeted':'mAP',
              'VGGSound': 'acc'}
 
-args.main_metrics = label_metric[args.dataset]
+if args.dataset in label_metric:
+    args.main_metrics = label_metric[args.dataset]
+else:
+    args.main_metric = 'mAP'
+
+if args.old_class_indices == "DEFAULT":
+    args.old_class_indices = args.class_indices
 
 try:
     # Read new class indices
@@ -196,10 +202,9 @@ def main():
         start_time = time.time()
 
         a_data = format_model_input(audio_file_path, args.target_length, args.num_mel_bins, args.norm_mean, args.norm_std)
-        v_data = torch.zeros([3, 1, 1]) + 0.01
         label_data = format_label_data(labels, index_dict, args.label_dim, args.label_smooth)
 
-        trainer.train_on_single_pair(a_data, v_data, label_data)
+        trainer.train_on_audio_only(a_data, label_data)
 
         end_time = time.time()
 

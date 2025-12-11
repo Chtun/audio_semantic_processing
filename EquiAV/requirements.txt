@@ -1,0 +1,8 @@
+timm==0.4.12
+torchaudio==2.8.0
+soundfile
+wandb
+scipy
+scikit-learn
+pandas
+numpy

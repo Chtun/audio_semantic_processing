@@ -11,15 +11,6 @@ import torch.nn as nn
 from torch.cuda.amp import autocast, GradScaler
 from utils import *
 
-class WrappedModel(nn.Module):
-    ## The purpose of this wrapper is to make the model structure consistent between single and multi-GPU
-    def __init__(self, model):
-        super(WrappedModel, self).__init__()
-        self.module = model
-
-    def forward(self, data_a, data_v, labels=None):
-        return self.module(data_a, data_v, labels)
-
 class EquiAV_ft(nn.Module):
     def __init__(self, trainfunc_ft, model, **kwargs):
         super(EquiAV_ft, self).__init__();
@@ -42,9 +33,17 @@ class EquiAV_ft(nn.Module):
 
         return loss_dict, outputs
 
+class WrappedModel(nn.Module):
+    ## The purpose of this wrapper is to make the model structure consistent between single and multi-GPU
+    def __init__(self, model: EquiAV_ft):
+        super(WrappedModel, self).__init__()
+        self.module = model
+
+    def forward(self, data_a, data_v, labels=None):
+        return self.module(data_a, data_v, labels)
 
 class ModelTrainer(nn.Module):
-    def __init__(self, equiAV, gpu, optimizer='adamw', mixedprec=True, freeze_base=False, no_wandb=False, **kwargs):
+    def __init__(self, equiAV: WrappedModel, gpu, optimizer='adamw', mixedprec=True, freeze_base=False, no_wandb=False, **kwargs):
         super(ModelTrainer, self).__init__()
 
         self.__model__  = equiAV
@@ -319,6 +318,81 @@ class ModelTrainer(nn.Module):
         # transform input to torch cuda tensor if running gpu
         audio_data = audio_data.to(self.device)  # target_length x num melbins (assuming batch dim is handled by model)
         video_data = video_data.to(self.device)  # channel x width x height (assuming batch dim is handled by model)
+        label_data = label_data.to(self.device)
+
+        # Add a batch dimension if your model expects it
+        # For example, if your model expects [batch_size, ...] but you're passing [feature_dims, ...]
+        audio_data = audio_data.unsqueeze(0) if audio_data.dim() == 2 else audio_data
+        video_data = video_data.unsqueeze(0) if video_data.dim() == 3 else video_data
+        label_data = label_data.unsqueeze(0) if label_data.dim() == 1 else label_data
+
+        # ==================== FORWARD PASS ====================
+        with autocast(enabled=self.mixedprec):
+            loss_dict, outputs = self.__model__(audio_data, video_data, labels=label_data)
+
+        _new_lr = self.__scheduler__.step() # You might want to control when scheduler steps
+
+        if self.mixedprec:
+            # mixed precision
+            self.scaler.scale(loss_dict['loss']).backward()
+            self.scaler.step(self.__optimizer__)
+            self.scaler.update()
+        else:
+            # single precision
+            loss_dict['loss'].backward()
+            self.__optimizer__.step()
+
+        self.zero_grad() # Assuming this resets gradients for the next step
+
+        # logging
+        # For a single pair, batch_size is 1
+        metrics.update(loss_dict['loss'].item(), 1) # Use .item() to get scalar from tensor
+
+        # measure elapsed time and memory
+        batch_time.update(time.time() - end)
+        mem.update(torch.cuda.max_memory_allocated() // 1e9)
+
+        print(f"Trained on single pair. Loss: {metrics.val:.4f}")
+
+        # You can return the loss or any other relevant metric
+        return metrics.val
+
+    def train_on_audio_only(self, audio_data, label_data):
+        """
+        Trains the network on a single audio/label pair.
+
+        Args:
+            self: An instance of the class containing the model, optimizer, etc.
+                (e.g., your Trainer class).
+            audio_data (torch.Tensor): A single audio input tensor.
+            label_data (torch.Tensor): A single label tensor.
+
+        Returns:
+            float: The training loss for this single pair.
+        """
+        print("Beginning to train network on an audio-only single pair!")
+
+        if self.__model__.module.__M__.ftmode != "audio_only":
+            raise ValueError("The model is not configured for audio only data!")
+
+        # Setting for the logging (simplified for a single pair)
+        batch_time = AverageMeter('Time', ':6.2f')
+        data_time = AverageMeter('Data', ':6.2f')
+        mem = AverageMeter('Mem (GB)', ':6.1f')
+        metrics = AverageMeter('Train Loss', ':1.3e')
+
+        # Ensure model is in training mode
+        self.__model__.train()
+
+        end = time.time()
+
+        # Measure "data loading" time (simulated for a single pair)
+        data_time.update(0) # Since data is directly passed
+
+        # transform input to torch cuda tensor if running gpu
+        audio_data = audio_data.to(self.device)  # target_length x num melbins (assuming batch dim is handled by model)
+        video_data = torch.zeros([3, 1, 1]) + 0.01 # Dummy data to input for video
+        video_data = video_data.to(self.device)
         label_data = label_data.to(self.device)
 
         # Add a batch dimension if your model expects it
